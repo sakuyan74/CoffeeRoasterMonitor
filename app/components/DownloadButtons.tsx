@@ -2,7 +2,7 @@
 
 import { DateRange } from 'react-day-picker';
 import { Button } from './ui/button';
-import { Download, FileDown, LineChart } from 'lucide-react';
+import { FileDown, LineChart } from 'lucide-react';
 
 interface DownloadButtonsProps {
   dateRange: DateRange | undefined;
@@ -39,7 +39,7 @@ export default function DownloadButtons({ dateRange }: DownloadButtonsProps) {
         className="shadow-sm hover:shadow transition-all"
       >
         <FileDown className="mr-2 h-4 w-4" />
-        CSVデータ
+        CSVデータダウンロード
       </Button>
       <Button
         variant="outline"
@@ -48,7 +48,7 @@ export default function DownloadButtons({ dateRange }: DownloadButtonsProps) {
         className="shadow-sm hover:shadow transition-all"
       >
         <LineChart className="mr-2 h-4 w-4" />
-        グラフ
+        グラフダウンロード
       </Button>
     </div>
   );

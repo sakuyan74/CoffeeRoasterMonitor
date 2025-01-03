@@ -4,8 +4,22 @@ import { ReactNode } from 'react';
 import DownloadButtons from './DownloadButtons';
 import { DateRangePicker } from './DateRangePicker';
 import { DateRange } from 'react-day-picker';
-import { BarChart3, Settings, Home } from 'lucide-react';
+import { BarChart3, Settings, Home, Search } from 'lucide-react';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
+
+interface NavItem {
+  icon: typeof Home;
+  label: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { icon: Home, label: 'ホーム', href: '/' },
+  { icon: Search, label: '検索', href: '/search' },
+  { icon: BarChart3, label: '統計', href: '/statistics' },
+  { icon: Settings, label: '設定', href: '/settings' },
+];
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,65 +29,64 @@ interface LayoutProps {
 
 export default function Layout({ children, onDateRangeChange, dateRange }: LayoutProps) {
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
       {/* サイドバー */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-20">
-        <div className="flex flex-col h-full p-4">
-          <div className="mb-6">
-            <h1 className="text-xl font-bold text-gray-800">コーヒー焙煎モニター</h1>
+      <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+        <div className="flex h-full flex-col gap-y-5 px-6 py-4">
+          <div className="flex h-16 items-center">
+            <h1 className="text-xl font-bold text-gray-900">コーヒー焙煎モニター</h1>
           </div>
-          <nav className="flex-1 space-y-2">
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 hover:bg-gray-100"
-            >
-              <Home className="w-5 h-5" />
-              <span>ホーム</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 hover:bg-gray-100"
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>統計</span>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start gap-2 hover:bg-gray-100"
-            >
-              <Settings className="w-5 h-5" />
-              <span>設定</span>
-            </Button>
+          <nav className="flex flex-1 flex-col">
+            <ul className="flex flex-1 flex-col gap-y-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <a href={item.href}>
+                      <Button
+                        variant="ghost"
+                        className={cn(
+                          'w-full justify-start gap-x-3',
+                          'hover:bg-gray-100 hover:text-gray-900',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400'
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.label}
+                      </Button>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </nav>
         </div>
       </aside>
 
       {/* メインコンテンツ */}
-      <div className="pl-64 w-full min-h-screen bg-gray-100">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-5xl mx-auto px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">温度モニター</h2>
-          </div>
-        </header>
+      <main className="flex-1 pl-64">
+        <div className="flex h-full flex-col">
+          <header className="sticky top-0 z-10 bg-white shadow-sm">
+            <div className="flex h-16 items-center gap-x-4 px-6">
+              <h2 className="text-lg font-semibold text-gray-900">温度モニター</h2>
+            </div>
+          </header>
 
-        <main className="max-w-5xl mx-auto px-6 py-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <div className="flex-1 px-6 py-8">
+            <div className="rounded-lg bg-white p-6 shadow-md">
+              <div className="space-y-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <DateRangePicker onDateRangeChange={onDateRangeChange} />
-                  <div className="flex gap-2">
-                    <DownloadButtons dateRange={dateRange} />
-                  </div>
+                  <DownloadButtons dateRange={dateRange} />
                 </div>
-              </div>
-              <div className="overflow-x-auto">
-                {children}
+                <div className="overflow-x-auto">
+                  {children}
+                </div>
               </div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

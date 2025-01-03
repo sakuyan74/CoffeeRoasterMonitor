@@ -17,7 +17,10 @@ export default function Home() {
   };
 
   return (
-    <Layout onDateRangeChange={handleDateRangeChange}>
+    <Layout 
+      onDateRangeChange={handleDateRangeChange} 
+      dateRange={dateRange}
+    >
       <div className="space-y-8">
         <TemperatureChart dateRange={dateRange} />
         <TemperatureTable dateRange={dateRange} />

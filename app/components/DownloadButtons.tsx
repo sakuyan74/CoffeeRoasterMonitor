@@ -1,55 +1,55 @@
 'use client';
 
-import { useCallback } from 'react';
-import { TemperatureData } from '@/lib/mockData';
 import { DateRange } from 'react-day-picker';
+import { Button } from './ui/button';
+import { Download, FileDown, LineChart } from 'lucide-react';
 
 interface DownloadButtonsProps {
   dateRange: DateRange | undefined;
 }
 
 export default function DownloadButtons({ dateRange }: DownloadButtonsProps) {
-  const downloadCSV = useCallback(() => {
-    fetch('/api/temperature')
-      .then(response => response.json())
-      .then((data: TemperatureData[]) => {
-        // 日付範囲でデータをフィルタリング
-        const filteredData = data.filter(item => {
-          const itemDate = new Date(item.timestamp);
-          return (!dateRange?.from || itemDate >= dateRange.from) &&
-                 (!dateRange?.to || itemDate <= dateRange.to);
-        });
+  const handleDownload = async (format: 'csv' | 'pdf') => {
+    if (!dateRange?.from || !dateRange?.to) return;
 
-        const csvContent = "data:text/csv;charset=utf-8," 
-          + "日時,温度\n"
-          + filteredData.map((row) => `${row.timestamp},${row.temperature}`).join("\n");
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "temperature_data.csv");
-        document.body.appendChild(link);
-        link.click();
-      });
-  }, [dateRange]);
+    const params = new URLSearchParams({
+      from: dateRange.from.toISOString(),
+      to: dateRange.to.toISOString(),
+      format: format
+    });
 
-  const downloadPNG = useCallback(() => {
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      const link = document.createElement('a');
-      link.download = 'temperature_chart.png';
-      link.href = canvas.toDataURL();
-      link.click();
-    }
-  }, []);
+    const response = await fetch(`/api/download?${params.toString()}`);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `temperature-data.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
-    <div className="flex space-x-4">
-      <button onClick={downloadCSV} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        CSVダウンロード
-      </button>
-      <button onClick={downloadPNG} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        グラフ画像ダウンロード
-      </button>
+    <div className="flex gap-2">
+      <Button
+        variant="outline"
+        onClick={() => handleDownload('csv')}
+        disabled={!dateRange?.from || !dateRange?.to}
+        className="shadow-sm hover:shadow transition-all"
+      >
+        <FileDown className="mr-2 h-4 w-4" />
+        CSVデータ
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => handleDownload('pdf')}
+        disabled={!dateRange?.from || !dateRange?.to}
+        className="shadow-sm hover:shadow transition-all"
+      >
+        <LineChart className="mr-2 h-4 w-4" />
+        グラフ
+      </Button>
     </div>
   );
 }

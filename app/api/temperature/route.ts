@@ -14,16 +14,14 @@ import { generateMockData } from '@/lib/mockData';
 
 export async function GET() {
   try {
-    // if (!db) {
-    //   throw new Error('Database is not initialized');
-    // }
-    // const temperatures = await db.all('SELECT * FROM temperatures ORDER BY timestamp DESC LIMIT 100');
-    // return NextResponse.json(temperatures);
     const mockData = generateMockData();
     return NextResponse.json(mockData);
-  } catch (error) {
+  } catch (error: any) {
     console.error('データ生成エラー:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' }, 
+      { status: 500 }
+    );
   }
 }
 

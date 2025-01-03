@@ -19,6 +19,25 @@ function generateTimePoints(startTime: Date, duration: number) {
   return timePoints;
 }
 
+// リアルタイムデータ生成用の関数
+export function generateMockData() {
+  const now = new Date();
+  const data = [];
+  
+  // 過去30分のデータを30秒間隔で生成
+  for (let i = 0; i < 60; i++) {
+    const timestamp = new Date(now.getTime() - (60 - i) * 30000);
+    const temperature = 180 + Math.sin(i / 10) * 30 + Math.random() * 5;
+    
+    data.push({
+      timestamp: timestamp.toISOString(),
+      temperature: Math.round(temperature),
+    });
+  }
+  
+  return data;
+}
+
 // サンプルの豆データ
 const sampleBeans = [
   { name: 'エチオピア イルガチェフェ G1', tags: ['エチオピア', 'フルーティ', '浅煎り'] },

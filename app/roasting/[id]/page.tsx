@@ -117,20 +117,20 @@ export default function RoastingDetailPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto px-4 py-6 space-y-6 lg:max-w-5xl">
       {/* パンくず */}
       <div className="flex items-center gap-2 text-sm text-gray-600">
         <Link href="/search" className="hover:text-gray-900">検索結果</Link>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-900">
-          {format(new Date(session.metadata.date), 'PPP', { locale: ja })}
+        <span className="text-gray-900 line-clamp-1">
+          {format(session.metadata.date, 'PPP', { locale: ja })}
           {' '}
           {session.metadata.beanName}
         </span>
       </div>
 
       {/* アクションボタン */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Button variant="outline" className="gap-2">
           <FileDown className="h-4 w-4" />
           CSVダウンロード
@@ -142,86 +142,86 @@ export default function RoastingDetailPage() {
       </div>
 
       {/* メタデータ */}
-      <div className="grid gap-6 p-6 bg-gray-50 rounded-lg">
+      <div className="grid gap-6 p-4 sm:p-6 bg-gray-50 rounded-lg">
         <div className="space-y-2">
-          <h2 className="text-xl font-bold">{session.metadata.beanName}</h2>
-          <div className="flex gap-1.5">
+          <h2 className="text-lg sm:text-xl font-bold line-clamp-2">{session.metadata.beanName}</h2>
+          <div className="flex flex-wrap gap-1.5">
             {session.metadata.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
+              <Badge key={tag} variant="outline" className="text-xs sm:text-sm">
                 {tag}
               </Badge>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">焙煎日時</p>
-            <p className="font-medium">
-              {format(new Date(session.metadata.date), 'PPP HH:mm', { locale: ja })}
+            <p className="text-xs sm:text-sm text-gray-500">焙煎日時</p>
+            <p className="text-sm sm:text-base font-medium">
+              {format(session.metadata.date, 'PPP HH:mm', { locale: ja })}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">投入量</p>
-            <p className="font-medium">{session.metadata.inputWeight}g</p>
+            <p className="text-xs sm:text-sm text-gray-500">投入量</p>
+            <p className="text-sm sm:text-base font-medium">{session.metadata.inputWeight}g</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">焼き上がり量</p>
-            <p className="font-medium">{session.metadata.outputWeight}g</p>
+            <p className="text-xs sm:text-sm text-gray-500">焼き上がり量</p>
+            <p className="text-sm sm:text-base font-medium">{session.metadata.outputWeight}g</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">歩留まり</p>
-            <p className="font-medium">
+            <p className="text-xs sm:text-sm text-gray-500">歩留まり</p>
+            <p className="text-sm sm:text-base font-medium">
               {Math.round((session.metadata.outputWeight / session.metadata.inputWeight) * 1000) / 10}%
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">最高気温</p>
-            <p className="font-medium">{session.metadata.maxTemperature}℃</p>
+            <p className="text-xs sm:text-sm text-gray-500">最高気温</p>
+            <p className="text-sm sm:text-base font-medium">{session.metadata.maxTemperature}℃</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">最低気温</p>
-            <p className="font-medium">{session.metadata.minTemperature}℃</p>
+            <p className="text-xs sm:text-sm text-gray-500">最低気温</p>
+            <p className="text-sm sm:text-base font-medium">{session.metadata.minTemperature}℃</p>
           </div>
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">湿度</p>
-            <p className="font-medium">{session.metadata.humidity}%</p>
+            <p className="text-xs sm:text-sm text-gray-500">湿度</p>
+            <p className="text-sm sm:text-base font-medium">{session.metadata.humidity}%</p>
           </div>
         </div>
 
         {session.metadata.notes && (
           <div className="space-y-1">
-            <p className="text-sm text-gray-500">備考</p>
-            <p className="text-gray-900">{session.metadata.notes}</p>
+            <p className="text-xs sm:text-sm text-gray-500">備考</p>
+            <p className="text-sm sm:text-base text-gray-900">{session.metadata.notes}</p>
           </div>
         )}
       </div>
 
       {/* 温度グラフ */}
-      <div className="p-6 bg-white rounded-lg shadow">
+      <div className="p-4 sm:p-6 bg-white rounded-lg shadow">
         <Line options={chartOptions} data={chartData} />
       </div>
 
       {/* タイミングデータテーブル */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>時刻</TableHead>
-              <TableHead>温度</TableHead>
-              <TableHead>ハゼ1</TableHead>
-              <TableHead>ハゼ2</TableHead>
+              <TableHead className="text-xs sm:text-sm">時刻</TableHead>
+              <TableHead className="text-xs sm:text-sm">温度</TableHead>
+              <TableHead className="text-xs sm:text-sm">ハゼ1</TableHead>
+              <TableHead className="text-xs sm:text-sm">ハゼ2</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {session.timePoints.map((point, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  {format(new Date(point.timestamp), 'HH:mm:ss', { locale: ja })}
+                <TableCell className="text-xs sm:text-sm">
+                  {format(point.timestamp, 'HH:mm:ss', { locale: ja })}
                 </TableCell>
-                <TableCell>{point.temperature}℃</TableCell>
-                <TableCell>{point.isFirstCrack ? '✓' : ''}</TableCell>
-                <TableCell>{point.isSecondCrack ? '✓' : ''}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{point.temperature}℃</TableCell>
+                <TableCell className="text-xs sm:text-sm">{point.isFirstCrack ? '✓' : ''}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{point.isSecondCrack ? '✓' : ''}</TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -63,8 +63,8 @@ export function RoastingSessionList({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <p className="text-xs sm:text-sm text-gray-500">
           {startItem}~{endItem}件 / {totalItems}件を表示
         </p>
         <Pagination
@@ -82,24 +82,26 @@ export function RoastingSessionList({
             className="block"
           >
             <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between">
-                <div className="space-y-3">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-3 min-w-0 flex-1">
                   <div className="flex flex-col gap-1">
-                    <time className="text-lg font-medium text-gray-900">
+                    <time className="text-base sm:text-lg font-medium text-gray-900 line-clamp-1">
                       {format(new Date(session.metadata.date), 'PPP', { locale: ja })}
                     </time>
-                    <time className="text-sm text-gray-500">
+                    <time className="text-xs sm:text-sm text-gray-500">
                       {format(new Date(session.metadata.date), 'p', { locale: ja })}
                     </time>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-base font-medium text-gray-900">{session.metadata.beanName}</h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-1">
+                      {session.metadata.beanName}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
                       <span>投入量: {session.metadata.inputWeight}g</span>
-                      <span>→</span>
+                      <span className="hidden sm:inline">→</span>
                       <span>焼き上がり: {session.metadata.outputWeight}g</span>
                     </div>
-                    <div className="flex gap-1.5">
+                    <div className="flex flex-wrap gap-1.5">
                       {session.metadata.tags.map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
@@ -108,7 +110,7 @@ export function RoastingSessionList({
                     </div>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-gray-400 mt-1" />
+                <ChevronRight className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" />
               </div>
             </div>
           </Link>

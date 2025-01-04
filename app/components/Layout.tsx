@@ -1,90 +1,111 @@
 'use client'
 
-import { ReactNode } from 'react';
-import DownloadButtons from './DownloadButtons';
-import { DateRangePicker } from './DateRangePicker';
-import { DateRange } from 'react-day-picker';
-import { BarChart3, Settings, Home, Search } from 'lucide-react';
-import { Button } from './ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
+import { Button } from "@/app/components/ui/button";
+import { Home, Search, Menu } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
+import { useState } from "react";
 
 interface NavItem {
-  icon: typeof Home;
-  label: string;
   href: string;
+  label: string;
+  icon: React.ReactNode;
+  title: string;
 }
 
 const navItems: NavItem[] = [
-  { icon: Home, label: 'ホーム', href: '/' },
-  { icon: Search, label: '検索', href: '/search' },
-  { icon: BarChart3, label: '統計', href: '/statistics' },
-  { icon: Settings, label: '設定', href: '/settings' },
+  {
+    href: "/",
+    label: "ダッシュボード",
+    icon: <Home className="h-5 w-5" />,
+    title: "焙煎ダッシュボード",
+  },
+  {
+    href: "/search",
+    label: "焙煎履歴検索",
+    icon: <Search className="h-5 w-5" />,
+    title: "焙煎履歴検索",
+  },
 ];
 
-interface LayoutProps {
-  children: ReactNode;
-  onDateRangeChange: (range: DateRange | undefined) => void;
-  dateRange: DateRange | undefined;
-}
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const currentPage = navItems.find(item => item.href === pathname) || navItems[0];
 
-export default function Layout({ children, onDateRangeChange, dateRange }: LayoutProps) {
+  const NavContent = () => (
+    <nav className="space-y-2">
+      {navItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          onClick={() => setIsOpen(false)}
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium",
+            "transition-colors hover:bg-gray-100",
+            pathname === item.href ? "bg-gray-100 text-gray-900" : "text-gray-600"
+          )}
+        >
+          {item.icon}
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* サイドバー */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg">
+      {/* PC用サイドバー */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-20 w-64 bg-white shadow-lg">
         <div className="flex h-full flex-col gap-y-5 px-6 py-4">
           <div className="flex h-16 items-center">
-            <h1 className="text-xl font-bold text-gray-900">コーヒー焙煎モニター</h1>
+            <h1 className="text-xl font-bold">Coffee Roaster</h1>
           </div>
-          <nav className="flex flex-1 flex-col">
-            <ul className="flex flex-1 flex-col gap-y-2">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <li key={item.href}>
-                    <a href={item.href}>
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          'w-full justify-start gap-x-3',
-                          'hover:bg-gray-100 hover:text-gray-900',
-                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400'
-                        )}
-                      >
-                        <Icon className="h-5 w-5" />
-                        {item.label}
-                      </Button>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <div className="flex-1">
+            <NavContent />
+          </div>
         </div>
       </aside>
 
-      {/* メインコンテンツ */}
-      <main className="flex-1 pl-64">
-        <div className="flex h-full flex-col">
-          <header className="sticky top-0 z-10 bg-white shadow-sm">
-            <div className="flex h-16 items-center gap-x-4 px-6">
-              <h2 className="text-lg font-semibold text-gray-900">温度モニター</h2>
-            </div>
-          </header>
-
-          <div className="flex-1 px-6 py-8">
-            <div className="rounded-lg bg-white p-6 shadow-md">
-              <div className="space-y-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <DateRangePicker onDateRangeChange={onDateRangeChange} />
-                  <DownloadButtons dateRange={dateRange} />
+      {/* モバイル用ヘッダー */}
+      <div className="fixed top-0 left-0 right-0 z-30 lg:hidden">
+        <header className="bg-white border-b px-4 h-16 flex items-center justify-between shadow-sm">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">メニューを開く</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-64">
+              <div className="flex flex-col h-full">
+                <div className="px-4 py-6 border-b">
+                  <h1 className="text-xl font-bold">Coffee Roaster</h1>
                 </div>
-                <div className="overflow-x-auto">
-                  {children}
+                <div className="px-3 py-4">
+                  <NavContent />
                 </div>
               </div>
-            </div>
+            </SheetContent>
+          </Sheet>
+          <h2 className="text-lg font-semibold">{currentPage.title}</h2>
+          <div className="w-10" />
+        </header>
+      </div>
+
+      {/* メインコンテンツ */}
+      <main className={cn(
+        "flex-1 min-h-screen bg-gray-50",
+        "lg:pl-64", // PC表示時のサイドバー分のパディング
+        "pt-16 lg:pt-6" // モバイル表示時のヘッダー分のパディング
+      )}>
+        <div className="container mx-auto px-4">
+          <div className="hidden lg:block mb-6">
+            <h2 className="text-2xl font-semibold">{currentPage.title}</h2>
           </div>
+          {children}
         </div>
       </main>
     </div>

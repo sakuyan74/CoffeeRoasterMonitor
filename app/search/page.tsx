@@ -95,10 +95,10 @@ export default function SearchPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="container mx-auto px-4 py-6 space-y-6 lg:max-w-5xl">
       <div className="grid gap-6">
         {/* 検索フォーム */}
-        <div className="space-y-6 bg-gray-50 p-6 rounded-lg">
+        <div className="space-y-6 bg-gray-50 p-4 sm:p-6 rounded-lg">
           {/* 日付範囲選択 */}
           <div className="space-y-2">
             <Label>期間</Label>
@@ -133,7 +133,7 @@ export default function SearchPage() {
                   defaultMonth={dateRange?.from}
                   selected={dateRange}
                   onSelect={setDateRange}
-                  numberOfMonths={2}
+                  numberOfMonths={1}
                   locale={ja}
                 />
               </PopoverContent>
@@ -154,7 +154,7 @@ export default function SearchPage() {
           {/* 豆の量範囲 */}
           <div className="space-y-2">
             <Label>豆の量 (g)</Label>
-            <div className="flex gap-4">
+            <div className="flex gap-2 sm:gap-4">
               <div className="flex-1">
                 <Input
                   type="number"
@@ -183,7 +183,7 @@ export default function SearchPage() {
                 <Badge
                   key={tag}
                   variant={selectedTags.includes(tag) ? 'default' : 'outline'}
-                  className="cursor-pointer"
+                  className="cursor-pointer text-xs sm:text-sm"
                   onClick={() => toggleTag(tag)}
                 >
                   {tag}
@@ -201,7 +201,7 @@ export default function SearchPage() {
         {/* 検索結果 */}
         {hasSearched && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
               <div className="flex gap-4">
                 <Button
                   variant="ghost"

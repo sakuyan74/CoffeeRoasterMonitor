@@ -1,11 +1,11 @@
 'use client'
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/app/components/ui/button";
-import { Home, Search, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Home, Search, Menu, Coffee } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 
 interface NavItem {
@@ -27,6 +27,12 @@ const navItems: NavItem[] = [
     label: "焙煎履歴検索",
     icon: <Search className="h-5 w-5" />,
     title: "焙煎履歴検索",
+  },
+  {
+    href: "/beans",
+    label: "豆情報",
+    icon: <Coffee className="h-5 w-5" />,
+    title: "豆情報",
   },
 ];
 

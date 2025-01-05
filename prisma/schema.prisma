@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model Bean {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  name        String
+  country     String
+  region      String?
+  farm        String?
+  variety     String
+  elevation   Int?
+  process     String
+  cropYear    String
+  grade       String?
+  description String?
+  tags        String[]
+  sessions    RoastingSession[]
+}
+
+model RoastingTimePoint {
+  id                  String          @id @default(cuid())
+  timestamp           DateTime
+  temperature         Float
+  isFirstCrack        Boolean         @default(false)
+  isSecondCrack       Boolean         @default(false)
+  ambientTemperature  Float
+  humidity            Float
+  session            RoastingSession  @relation(fields: [sessionId], references: [id])
+  sessionId          String
+}
+
+model RoastingSession {
+  id            String            @id @default(cuid())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  date          DateTime          @default(now())
+  beanName      String
+  inputWeight   Float
+  outputWeight  Float
+  notes         String?
+  timePoints    RoastingTimePoint[]
+  bean          Bean              @relation(fields: [beanId], references: [id])
+  beanId        String
+  averageTemp   Float
+  averageHumidity Float
+}
+
+model Settings {
+  id                String   @id @default("default")
+  maxTemperature    Float    @default(250)
+  minTemperature    Float    @default(0)
+  sampleInterval    Int      @default(1000)
+  updatedAt         DateTime @updatedAt
+}

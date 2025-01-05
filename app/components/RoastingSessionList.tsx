@@ -1,11 +1,11 @@
 'use client';
 
-import { RoastingSession } from '@/lib/types';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { RoastingSession } from '@/lib/types';
 
 interface RoastingSessionListProps {
   sessions: RoastingSession[];
@@ -78,7 +78,7 @@ export function RoastingSessionList({
         {sessions.map((session) => (
           <Link
             key={session.id}
-            href={`/roasting/${session.id.replace('session-', '')}`}
+            href={`/roasting/${session.id}`}
             className="block"
           >
             <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -86,23 +86,23 @@ export function RoastingSessionList({
                 <div className="space-y-3 min-w-0 flex-1">
                   <div className="flex flex-col gap-1">
                     <time className="text-base sm:text-lg font-medium text-gray-900 line-clamp-1">
-                      {format(new Date(session.metadata.date), 'PPP', { locale: ja })}
+                      {format(new Date(session.date), 'PPP', { locale: ja })}
                     </time>
                     <time className="text-xs sm:text-sm text-gray-500">
-                      {format(new Date(session.metadata.date), 'p', { locale: ja })}
+                      {format(new Date(session.date), 'p', { locale: ja })}
                     </time>
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-sm sm:text-base font-medium text-gray-900 line-clamp-1">
-                      {session.metadata.beanName}
+                      {session.bean.name}
                     </h3>
                     <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
-                      <span>投入量: {session.metadata.inputWeight}g</span>
+                      <span>投入量: {session.inputWeight}g</span>
                       <span className="hidden sm:inline">→</span>
-                      <span>焼き上がり: {session.metadata.outputWeight}g</span>
+                      <span>焼き上がり: {session.outputWeight}g</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                      {session.metadata.tags.map((tag) => (
+                      {session.bean.tags.map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
                         </Badge>

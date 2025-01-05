@@ -31,14 +31,14 @@ export interface Bean {
 export interface BeanFormData {
   name: string;
   country: string;
-  region: string;
-  farm: string;
+  region: string | null;
+  farm: string | null;
   variety: string;
-  elevation?: number;
+  elevation: number | null;
   process: string;
   cropYear: string;
-  grade: string;
-  description: string;
+  grade: string | null;
+  description: string | null;
   tags: string[];
 }
 
@@ -46,8 +46,9 @@ export interface BeanFormData {
 export interface RoastingSession {
   id: string;
   date: Date;
+  beanId: string;
   beanName: string;
-  notes?: string;
+  notes: string | null;
   inputWeight: number;
   outputWeight: number;
   averageTemp: number;

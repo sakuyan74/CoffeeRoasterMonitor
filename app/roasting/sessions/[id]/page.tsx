@@ -1,8 +1,7 @@
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { FileDown, LineChart, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import {
   Table,
@@ -12,42 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { RoastingChart } from '@/components/RoastingChart';
+import { ActionButtons } from './ActionButtons';
 import { prisma } from '@/lib/prisma';
-import { RoastingChart } from './RoastingChart';
-import { notFound } from 'next/navigation';
+import { Toaster } from '@/components/ui/toaster';
 
-interface RoastingTimePoint {
-  id: string;
-  timestamp: Date;
-  temperature: number;
-  isFirstCrack: boolean;
-  isSecondCrack: boolean;
-  ambientTemperature: number;
-  humidity: number;
+interface Props {
+  params: {
+    id: string;
+  };
 }
 
-interface Bean {
-  id: string;
-  name: string;
-  tags: string[];
-}
-
-interface RoastingSession {
-  id: string;
-  date: Date;
-  beanName: string;
-  notes?: string;
-  inputWeight: number;
-  outputWeight: number;
-  timePoints: RoastingTimePoint[];
-  bean: Bean;
-}
-
-export default async function RoastingDetailPage({
-  params
-}: {
-  params: { id: string }
-}) {
+export default async function RoastingSessionPage({ params }: Props) {
   const session = await prisma.roastingSession.findUnique({
     where: { id: params.id },
     include: {
@@ -57,42 +32,27 @@ export default async function RoastingDetailPage({
   });
 
   if (!session) {
-    notFound();
+    return <div>セッションが見つかりません</div>;
   }
-
-  // 平均温度と湿度を計算
-  const averageTemp = session.timePoints.reduce((sum: number, point: RoastingTimePoint) => 
-    sum + point.ambientTemperature, 0
-  ) / session.timePoints.length;
-  
-  const averageHumidity = session.timePoints.reduce((sum: number, point: RoastingTimePoint) => 
-    sum + point.humidity, 0
-  ) / session.timePoints.length;
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6 lg:max-w-5xl">
       {/* パンくず */}
       <div className="flex items-center gap-2 text-sm text-gray-600">
-        <Link href="/search" className="hover:text-gray-900">検索結果</Link>
+        <Link href="/roasting/sessions/list" className="hover:text-gray-900">検索結果</Link>
         <ChevronRight className="h-4 w-4" />
         <span className="text-gray-900 line-clamp-1">
-          {format(session.date, 'PPP', { locale: ja })}
+          {format(new Date(session.date), 'PPP', { locale: ja })}
           {' '}
           {session.bean.name}
         </span>
       </div>
 
       {/* アクションボタン */}
-      <div className="flex flex-wrap gap-4">
-        <Button variant="outline" className="gap-2">
-          <FileDown className="h-4 w-4" />
-          CSVダウンロード
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <LineChart className="h-4 w-4" />
-          グラフダウンロード
-        </Button>
-      </div>
+      <ActionButtons 
+        sessionId={session.id} 
+        sessionDate={session.date} 
+      />
 
       {/* メタデータ */}
       <div className="grid gap-6 p-4 sm:p-6 bg-gray-50 rounded-lg">
@@ -111,7 +71,7 @@ export default async function RoastingDetailPage({
           <div className="space-y-1">
             <p className="text-xs sm:text-sm text-gray-500">焙煎日時</p>
             <p className="text-sm sm:text-base font-medium">
-              {format(session.date, 'PPP HH:mm', { locale: ja })}
+              {format(new Date(session.date), 'PPP HH:mm', { locale: ja })}
             </p>
           </div>
           <div className="space-y-1">
@@ -130,11 +90,11 @@ export default async function RoastingDetailPage({
           </div>
           <div className="space-y-1">
             <p className="text-xs sm:text-sm text-gray-500">平均気温</p>
-            <p className="text-sm sm:text-base font-medium">{averageTemp.toFixed(1)}℃</p>
+            <p className="text-sm sm:text-base font-medium">{session.averageTemp.toFixed(1)}℃</p>
           </div>
           <div className="space-y-1">
             <p className="text-xs sm:text-sm text-gray-500">平均湿度</p>
-            <p className="text-sm sm:text-base font-medium">{averageHumidity.toFixed(1)}%</p>
+            <p className="text-sm sm:text-base font-medium">{session.averageHumidity.toFixed(1)}%</p>
           </div>
         </div>
 
@@ -147,7 +107,7 @@ export default async function RoastingDetailPage({
       </div>
 
       {/* 温度グラフ */}
-      <div className="p-4 sm:p-6 bg-white rounded-lg shadow">
+      <div className="p-4 sm:p-6 bg-white rounded-lg shadow" id="roasting-chart">
         <RoastingChart timePoints={session.timePoints} />
       </div>
 
@@ -165,10 +125,10 @@ export default async function RoastingDetailPage({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {session.timePoints.map((point: RoastingTimePoint, index: number) => (
+            {session.timePoints.map((point, index) => (
               <TableRow key={index}>
                 <TableCell className="text-xs sm:text-sm">
-                  {format(point.timestamp, 'HH:mm:ss', { locale: ja })}
+                  {format(new Date(point.timestamp), 'HH:mm:ss', { locale: ja })}
                 </TableCell>
                 <TableCell className="text-xs sm:text-sm">{point.temperature.toFixed(1)}℃</TableCell>
                 <TableCell className="text-xs sm:text-sm">{point.ambientTemperature.toFixed(1)}℃</TableCell>
@@ -180,6 +140,7 @@ export default async function RoastingDetailPage({
           </TableBody>
         </Table>
       </div>
+      <Toaster />
     </div>
   );
 } 

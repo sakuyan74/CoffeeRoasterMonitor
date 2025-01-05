@@ -1,3 +1,6 @@
+// 焙煎のステータス
+export type RoastingStatus = 'INCOMPLETE' | 'COMPLETED';
+
 // 焙煎のタイミングデータの型定義
 export interface RoastingTimePoint {
   id: string;
@@ -55,6 +58,7 @@ export interface RoastingSession {
   averageHumidity: number;
   timePoints: RoastingTimePoint[];
   bean: Bean;
+  status: RoastingStatus;
 }
 
 // APIレスポンスの型定義

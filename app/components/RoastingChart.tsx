@@ -1,5 +1,6 @@
 'use client';
 
+import { RoastingTimePoint } from '@/lib/types';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { Line } from 'react-chartjs-2';
@@ -26,16 +27,6 @@ ChartJS.register(
   Legend
 );
 
-interface RoastingTimePoint {
-  id: string;
-  timestamp: Date;
-  temperature: number;
-  isFirstCrack: boolean;
-  isSecondCrack: boolean;
-  ambientTemperature: number;
-  humidity: number;
-}
-
 interface RoastingChartProps {
   timePoints: RoastingTimePoint[];
 }
@@ -47,7 +38,7 @@ export function RoastingChart({ timePoints }: RoastingChartProps) {
     ),
     datasets: [
       {
-        label: '豆の温度 (℃)',
+        label: '豆温度 (℃)',
         data: timePoints.map(point => point.temperature),
         borderColor: 'rgb(234, 88, 12)',
         backgroundColor: 'rgba(234, 88, 12, 0.5)',
@@ -102,7 +93,7 @@ export function RoastingChart({ timePoints }: RoastingChartProps) {
         max: 240,
         title: {
           display: true,
-          text: '豆の温度 (℃)',
+          text: '豆温度 (℃)',
         },
       },
       y1: {

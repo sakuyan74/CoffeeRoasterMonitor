@@ -43,6 +43,11 @@ model RoastingTimePoint {
   sessionId          String
 }
 
+enum RoastingStatus {
+  INCOMPLETE
+  COMPLETED
+}
+
 model RoastingSession {
   id            String            @id @default(cuid())
   createdAt     DateTime          @default(now())
@@ -57,6 +62,9 @@ model RoastingSession {
   beanId        String
   averageTemp   Float
   averageHumidity Float
+  status        RoastingStatus    @default(INCOMPLETE)
+
+  @@index([beanId])
 }
 
 model Settings {

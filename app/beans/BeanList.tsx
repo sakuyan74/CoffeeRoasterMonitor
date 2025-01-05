@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Plus, MoreVertical } from 'lucide-react';
 import { Bean } from '@/lib/types';
@@ -15,48 +12,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { SearchBar } from '@/components/beans/SearchBar';
+import { DeleteBeanDialog } from '@/components/beans/DeleteBeanDialog';
 
 interface BeanListProps {
   beans: Bean[];
 }
 
 export function BeanList({ beans }: BeanListProps) {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredBeans, setFilteredBeans] = useState(beans);
   const [deleteTarget, setDeleteTarget] = useState<Bean | null>(null);
 
-  // 検索クエリに基づいて豆をフィルタリング
-  const filteredBeans = beans.filter(bean =>
-    bean.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    bean.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (bean.region && bean.region.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const handleDelete = async (bean: Bean) => {
-    try {
-      const response = await fetch(`/api/beans?id=${bean.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete bean');
-      }
-
-      router.refresh();
-    } catch (error) {
-      console.error('Error deleting bean:', error);
-      // TODO: エラー処理
-    }
+  const handleSearch = (query: string) => {
+    const filtered = beans.filter(bean =>
+      bean.name.toLowerCase().includes(query.toLowerCase()) ||
+      bean.country.toLowerCase().includes(query.toLowerCase()) ||
+      (bean.region && bean.region.toLowerCase().includes(query.toLowerCase()))
+    );
+    setFilteredBeans(filtered);
   };
 
   return (
@@ -73,17 +46,7 @@ export function BeanList({ beans }: BeanListProps) {
       </div>
 
       {/* 検索フォーム */}
-      <div className="mb-6">
-        <Label htmlFor="search">検索</Label>
-        <Input
-          id="search"
-          type="search"
-          placeholder="豆の名前、生産国、地域で検索..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-md"
-        />
-      </div>
+      <SearchBar onSearch={handleSearch} />
 
       {/* 豆一覧 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -160,31 +123,10 @@ export function BeanList({ beans }: BeanListProps) {
       )}
 
       {/* 削除確認ダイアログ */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>豆の削除</AlertDialogTitle>
-            <AlertDialogDescription>
-              「{deleteTarget?.name}」を削除してもよろしいですか？
-              この操作は取り消せません。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>キャンセル</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (deleteTarget) {
-                  handleDelete(deleteTarget);
-                  setDeleteTarget(null);
-                }
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              削除する
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteBeanDialog
+        bean={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+      />
     </>
   );
 } 

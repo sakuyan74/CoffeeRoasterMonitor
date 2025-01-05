@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Button } from '../components/ui/button';
-import { Calendar } from '../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Calendar as CalendarIcon, ArrowUpDown } from 'lucide-react';
-import { Badge } from '../components/ui/badge';
-import { RoastingSessionList } from '../components/RoastingSessionList';
+import { Badge } from '@/components/ui/badge';
+import { RoastingSessionList } from '@/components/RoastingSessionList';
 import { RoastingSession } from '@/lib/types';
 
 const ITEMS_PER_PAGE = 10;
@@ -34,7 +34,7 @@ interface SearchParams {
   humidityRange?: { min: number; max: number };
 }
 
-export default function SearchPage() {
+export default function RoastingSessionListPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [beanName, setBeanName] = useState('');
   const [weightRange, setWeightRange] = useState({ min: '', max: '' });
@@ -80,13 +80,13 @@ export default function SearchPage() {
         }
       }
 
-      const response = await fetch(`/api/roasting-sessions?${params}`);
+      const response = await fetch(`/api/roasting-sessions/completed?${params}`);
       if (!response.ok) throw new Error('Failed to fetch sessions');
       
       const data = await response.json();
       setSearchResults(data.sessions);
-      setTotalItems(data.total);
-      setTotalPages(data.totalPages);
+      setTotalItems(data.total || data.sessions.length);
+      setTotalPages(data.totalPages || Math.ceil(data.sessions.length / ITEMS_PER_PAGE));
       setHasSearched(true);
     } catch (error) {
       console.error('Error fetching sessions:', error);
@@ -287,7 +287,7 @@ export default function SearchPage() {
 
       {/* 検索結果 */}
       {hasSearched && (
-        <div className="space-y-4">
+        <div className="mt-8 space-y-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div className="flex gap-4">
               <Button
@@ -312,11 +312,11 @@ export default function SearchPage() {
           </div>
           <RoastingSessionList
             sessions={searchResults}
+            variant="detailed"
+            baseUrl="/roasting/sessions"
             currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalItems}
-            itemsPerPage={ITEMS_PER_PAGE}
             onPageChange={setCurrentPage}
+            pageSize={ITEMS_PER_PAGE}
           />
         </div>
       )}

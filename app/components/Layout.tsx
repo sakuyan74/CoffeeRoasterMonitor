@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Home, Search, Menu, Coffee } from "lucide-react";
+import { Home, Search, Menu, Coffee, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -23,7 +23,13 @@ const navItems: NavItem[] = [
     title: "焙煎ダッシュボード",
   },
   {
-    href: "/search",
+    href: "/roasting/register/list",
+    label: "未登録の焙煎一覧",
+    icon: <PlusCircle className="h-5 w-5" />,
+    title: "未登録の焙煎一覧",
+  },
+  {
+    href: "/roasting/sessions/list",
     label: "焙煎履歴検索",
     icon: <Search className="h-5 w-5" />,
     title: "焙煎履歴検索",

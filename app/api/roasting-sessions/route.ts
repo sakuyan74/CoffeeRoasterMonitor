@@ -1,73 +1,72 @@
-import { prisma } from '@/lib/prisma'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
+import { RoastingStatus } from '@/lib/types';
 
-export async function GET(req: NextRequest) {
+// バリデーションスキーマ
+const sessionSchema = z.object({
+  date: z.string().datetime(),
+  beanName: z.string(),
+  inputWeight: z.number(),
+  outputWeight: z.number(),
+  notes: z.string().optional(),
+  beanId: z.string(),
+  averageTemp: z.number(),
+  averageHumidity: z.number(),
+});
+
+export async function POST(request: Request) {
   try {
-    const searchParams = req.nextUrl.searchParams;
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const search = searchParams.get('search') || '';
-    const sortBy = searchParams.get('sortBy') || 'date';
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
-    const tempMin = parseFloat(searchParams.get('tempMin') || '0');
-    const tempMax = parseFloat(searchParams.get('tempMax') || '100');
-    const humidityMin = parseFloat(searchParams.get('humidityMin') || '0');
-    const humidityMax = parseFloat(searchParams.get('humidityMax') || '100');
+    const body = await request.json();
 
-    const skip = (page - 1) * limit;
+    // バリデーション
+    const validatedData = sessionSchema.parse(body);
 
-    // 検索条件を構築
-    const where = {
-      OR: [
-        { beanName: { contains: search } },
-        { notes: { contains: search } },
-      ],
-      AND: [
-        {
-          averageTemp: {
-            gte: tempMin,
-            lte: tempMax,
-          },
-        },
-        {
-          averageHumidity: {
-            gte: humidityMin,
-            lte: humidityMax,
-          },
-        },
-      ],
-    };
+    // セッションの作成（未完了状態）
+    const session = await prisma.roastingSession.create({
+      data: {
+        ...validatedData,
+        date: new Date(validatedData.date),
+      },
+    });
 
-    // 総件数を取得
-    const total = await prisma.roastingSession.count({ where });
+    return NextResponse.json(session, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      );
+    }
+    console.error('Error creating session:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
-    // セッションを取得
+// 未完了セッションの取得
+export async function GET(request: Request) {
+  try {
     const sessions = await prisma.roastingSession.findMany({
-      where,
+      where: {
+        status: 'INCOMPLETE'
+      },
       include: {
         timePoints: true,
         bean: true,
       },
       orderBy: {
-        [sortBy]: sortOrder,
+        date: 'desc',
       },
-      skip,
-      take: limit,
     });
 
-    return NextResponse.json({
-      sessions,
-      pagination: {
-        total,
-        totalPages: Math.ceil(total / limit),
-        currentPage: page,
-        limit,
-      },
-    });
+    return NextResponse.json({ sessions });
   } catch (error) {
-    console.error('Error fetching sessions:', error);
+    console.error('Error fetching incomplete sessions:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch sessions' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

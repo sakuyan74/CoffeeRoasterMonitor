@@ -14,17 +14,17 @@ export interface Bean {
   id: string;
   name: string;
   country: string;
-  region: string;
-  farm: string;
+  region?: string;
+  farm?: string;
   variety: string;
   elevation?: number;
   process: string;
   cropYear: string;
-  grade: string;
-  description: string;
+  grade?: string;
+  description?: string;
   tags: string[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // 豆マスタのフォーム用の型定義

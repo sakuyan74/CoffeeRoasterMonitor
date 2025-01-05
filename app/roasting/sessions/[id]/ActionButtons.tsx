@@ -70,29 +70,31 @@ export function ActionButtons({ sessionId, sessionDate }: ActionButtonsProps) {
     <div className="flex justify-between items-center">
       <Button 
         variant="outline" 
-        className="gap-2"
+        className="gap-1 sm:gap-2 h-8 sm:h-10 text-[10px] sm:text-sm px-2 sm:px-4"
         onClick={() => router.push(`/roasting/sessions/${sessionId}/edit`)}
       >
-        <Pencil className="h-4 w-4" />
+        <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
         編集
       </Button>
 
-      <div className="flex gap-4">
+      <div className="flex gap-1 sm:gap-4">
         <Button 
           variant="outline" 
-          className="gap-2"
+          className="gap-1 sm:gap-2 h-8 sm:h-10 text-[10px] sm:text-sm px-2 sm:px-4"
           onClick={handleCSVDownload}
         >
-          <FileDown className="h-4 w-4" />
-          CSVダウンロード
+          <FileDown className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">CSVダウンロード</span>
+          <span className="sm:hidden">CSV</span>
         </Button>
         <Button 
           variant="outline" 
-          className="gap-2"
+          className="gap-1 sm:gap-2 h-8 sm:h-10 text-[10px] sm:text-sm px-2 sm:px-4"
           onClick={handleChartDownload}
         >
-          <LineChart className="h-4 w-4" />
-          グラフダウンロード
+          <LineChart className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">グラフダウンロード</span>
+          <span className="sm:hidden">グラフ</span>
         </Button>
       </div>
     </div>
